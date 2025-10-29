@@ -22,16 +22,16 @@ export class PlayerEntity extends BaseEntity {
   defense: number;
 
   @Column('float', { default: 0 })
-  attackSpeed: number;
+  speedAttack: number;
 
   @Column('float', { default: 0 })
-  crit: number;
+  critical: number;
 
   @Column('float', { default: 0 })
-  critDamage: number;
+  criticalDamage: number;
 
   @Column('float', { default: 0 })
-  pvpAttack: number;
+  pvpDamage: number;
 
   @Column('float', { default: 0 })
   pvpDefense: number;
@@ -43,7 +43,19 @@ export class PlayerEntity extends BaseEntity {
   evasion: number;
 
   @Column('float', { default: 0 })
-  manaEfficiency: number;
+  manaEconomy: number;
+
+  @Column('float', { default: 0 })
+  criticalDefense: number;
+
+  @Column('float', { default: 0 })
+  penetration: number;
+
+  @Column('float', { default: 0 })
+  absorption: number;
+
+  @Column('float', { default: 0 })
+  movement: number;
 
   @Column('varchar', { length: 100, nullable: true })
   classChar: string;

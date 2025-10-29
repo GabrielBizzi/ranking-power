@@ -13,171 +13,345 @@ export class PlayersService {
   ) {}
 
   calculateScore(stats: any, classChar: string, type: 'DN' | 'MG'): number {
-    const base = {
-      hp: 0,
-      mp: 0,
-      attack: 0,
-      magicAttack: 0,
-      defense: 0,
-      attackSpeed: 0,
-      crit: 0,
-      critDamage: 0,
-      pvpAttack: 0,
-      pvpDefense: 0,
+    const s = {
+      hp: stats.hp ?? 0,
+      mp: stats.mp ?? 0,
+      attack: stats.attack ?? 0,
+      magicAttack: stats.magicAttack ?? 0,
+      defense: stats.defense ?? 0,
+      attackSpeed: stats.speedAttack ?? 0,
+      crit: stats.critical ?? 0,
+      critDamage: stats.criticalDamage ?? 0,
+      critDefense: stats.criticalDefense ?? 0,
+      pvpAttack: stats.pvpDamage ?? 0,
+      pvpDefense: stats.pvpDefense ?? 0,
+      penetration: stats.penetration ?? 0,
+      absorption: stats.absorption ?? 0,
+      precision: stats.precision ?? 0,
+      evasion: stats.evasion ?? 0,
+      manaEconomy: stats.manaEconomy ?? 0,
+      movement: stats.movement ?? 0,
     };
 
-    const DNweights: Record<string, Partial<typeof base>> = {
+    const DNweights: Record<string, Record<keyof typeof s, number>> = {
       Huntress: {
+        hp: 0.05,
+        mp: 0.05,
         attack: 0.25,
+        defense: 0.1,
+        magicAttack: 0,
         attackSpeed: 0.25,
         crit: 0.2,
         critDamage: 0.15,
+        critDefense: 0.05,
         pvpAttack: 0.1,
         pvpDefense: 0.05,
-        hp: 0,
-        defense: 0,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.1,
+        manaEconomy: 0,
+        movement: 0.05,
       },
       'Transknight Trans': {
         hp: 0.25,
         defense: 0.25,
         attack: 0.15,
-        crit: 0.1,
         attackSpeed: 0.1,
+        crit: 0.1,
+        critDamage: 0.1,
         pvpAttack: 0.075,
         pvpDefense: 0.075,
+        absorption: 0.1,
+        penetration: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0,
+        movement: 0.05,
+        mp: 0.05,
+        magicAttack: 0,
+        critDefense: 0.05,
       },
       'Transknight Confiança': {
         hp: 0.25,
-        defense: 0.25,
+        mp: 0.05,
         attack: 0.15,
-        crit: 0.1,
+        magicAttack: 0,
+        defense: 0.25,
         attackSpeed: 0.1,
+        crit: 0.1,
+        critDamage: 0.1,
+        critDefense: 0.05,
         pvpAttack: 0.075,
         pvpDefense: 0.075,
+        penetration: 0.05,
+        absorption: 0.1,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0,
+        movement: 0.05,
       },
       'BeastMaster Elemental': {
         hp: 0.25,
         defense: 0.2,
         attack: 0.2,
-        crit: 0.1,
         attackSpeed: 0.1,
+        crit: 0.1,
+        critDamage: 0.1,
         pvpAttack: 0.1,
         pvpDefense: 0.05,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0,
+        movement: 0.05,
+        mp: 0.05,
+        magicAttack: 0,
+        critDefense: 0.05,
       },
       'BeastMaster Evocação': {
         hp: 0.25,
-        defense: 0.2,
+        mp: 0.05,
         attack: 0.2,
-        crit: 0.1,
+        magicAttack: 0,
+        defense: 0.2,
         attackSpeed: 0.1,
+        crit: 0.1,
+        critDamage: 0.1,
+        critDefense: 0.05,
         pvpAttack: 0.1,
         pvpDefense: 0.05,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0,
+        movement: 0.05,
       },
       'BeastMaster Natureza': {
         hp: 0.25,
-        defense: 0.2,
+        mp: 0.05,
         attack: 0.2,
-        crit: 0.1,
+        magicAttack: 0,
+        defense: 0.2,
         attackSpeed: 0.1,
+        crit: 0.1,
+        critDamage: 0.1,
+        critDefense: 0.05,
         pvpAttack: 0.1,
         pvpDefense: 0.05,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0,
+        movement: 0.05,
       },
       'Foema Battle': {
         hp: 0.2,
-        defense: 0.2,
+        mp: 0.05,
         attack: 0.2,
-        crit: 0.1,
+        magicAttack: 0,
+        defense: 0.2,
         attackSpeed: 0.1,
+        crit: 0.1,
+        critDamage: 0.1,
+        critDefense: 0.05,
         pvpAttack: 0.1,
         pvpDefense: 0.1,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0,
+        movement: 0.05,
       },
       'Foema White': {
         hp: 0.2,
-        defense: 0.2,
+        mp: 0.05,
         attack: 0.2,
-        crit: 0.1,
+        magicAttack: 0,
+        defense: 0.2,
         attackSpeed: 0.1,
+        crit: 0.1,
+        critDamage: 0.1,
+        critDefense: 0.05,
         pvpAttack: 0.1,
         pvpDefense: 0.1,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0,
+        movement: 0.05,
       },
       'Foema Black': {
         hp: 0.2,
-        defense: 0.2,
+        mp: 0.05,
         attack: 0.2,
-        crit: 0.1,
+        magicAttack: 0,
+        defense: 0.2,
         attackSpeed: 0.1,
+        crit: 0.1,
+        critDamage: 0.1,
+        critDefense: 0.05,
         pvpAttack: 0.1,
         pvpDefense: 0.1,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0,
+        movement: 0.05,
       },
     };
-
-    const MGweights: Record<string, Partial<typeof base>> = {
+    const MGweights: Record<string, Record<keyof typeof s, number>> = {
       'Transknight MG': {
-        magicAttack: 0.4,
-        defense: 0.2,
         hp: 0.15,
         mp: 0.15,
+        attack: 0,
+        magicAttack: 0.4,
+        defense: 0.2,
+        attackSpeed: 0.05,
+        crit: 0.05,
+        critDamage: 0.05,
+        critDefense: 0.05,
         pvpAttack: 0.05,
         pvpDefense: 0.05,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0.05,
+        movement: 0.05,
       },
       'BeastMaster Elemental': {
-        magicAttack: 0.4,
-        defense: 0.2,
         hp: 0.15,
         mp: 0.15,
+        attack: 0,
+        magicAttack: 0.4,
+        defense: 0.2,
+        attackSpeed: 0.05,
+        crit: 0.05,
+        critDamage: 0.05,
+        critDefense: 0.05,
         pvpAttack: 0.05,
         pvpDefense: 0.05,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0.05,
+        movement: 0.05,
       },
       'BeastMaster Evocação': {
-        magicAttack: 0.4,
-        defense: 0.2,
         hp: 0.15,
         mp: 0.15,
+        attack: 0,
+        magicAttack: 0.4,
+        defense: 0.2,
+        attackSpeed: 0.05,
+        crit: 0.05,
+        critDamage: 0.05,
+        critDefense: 0.05,
         pvpAttack: 0.05,
         pvpDefense: 0.05,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0.05,
+        movement: 0.05,
       },
       'BeastMaster Natureza': {
-        magicAttack: 0.4,
-        defense: 0.2,
         hp: 0.15,
         mp: 0.15,
+        attack: 0,
+        magicAttack: 0.4,
+        defense: 0.2,
+        attackSpeed: 0.05,
+        crit: 0.05,
+        critDamage: 0.05,
+        critDefense: 0.05,
         pvpAttack: 0.05,
         pvpDefense: 0.05,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0.05,
+        movement: 0.05,
       },
       'Foema Battle': {
-        magicAttack: 0.4,
-        defense: 0.2,
         hp: 0.15,
         mp: 0.15,
+        attack: 0,
+        magicAttack: 0.4,
+        defense: 0.2,
+        attackSpeed: 0.05,
+        crit: 0.05,
+        critDamage: 0.05,
+        critDefense: 0.05,
         pvpAttack: 0.05,
         pvpDefense: 0.05,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0.05,
+        movement: 0.05,
       },
       'Foema White': {
-        magicAttack: 0.4,
-        defense: 0.2,
         hp: 0.15,
         mp: 0.15,
+        attack: 0,
+        magicAttack: 0.4,
+        defense: 0.2,
+        attackSpeed: 0.05,
+        crit: 0.05,
+        critDamage: 0.05,
+        critDefense: 0.05,
         pvpAttack: 0.05,
         pvpDefense: 0.05,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0.05,
+        movement: 0.05,
       },
       'Foema Black': {
-        magicAttack: 0.4,
-        defense: 0.2,
         hp: 0.15,
         mp: 0.15,
+        attack: 0,
+        magicAttack: 0.4,
+        defense: 0.1,
+        attackSpeed: 0.05,
+        crit: 0.05,
+        critDamage: 0.05,
+        critDefense: 0.05,
         pvpAttack: 0.05,
         pvpDefense: 0.05,
+        penetration: 0.05,
+        absorption: 0.05,
+        precision: 0.05,
+        evasion: 0.05,
+        manaEconomy: 0.05,
+        movement: 0.05,
       },
     };
 
     const weights =
       type === 'DN'
-        ? (DNweights[classChar] ?? base)
-        : (MGweights[classChar] ?? base);
+        ? (DNweights[classChar] ?? DNweights['Huntress'])
+        : (MGweights[classChar] ?? MGweights['Foema Black']);
 
     let score = 0;
     for (const key in weights) {
-      score += (stats[key] ?? 0) * weights[key];
+      const statValue = s[key as keyof typeof s] ?? 0;
+      const weight = weights[key as keyof typeof s] ?? 0;
+      score += statValue * weight;
     }
 
     return Math.round(score);
@@ -192,11 +366,35 @@ export class PlayersService {
     const stats = await this.ocrService.extractStats(filePath);
     const score = this.calculateScore(stats, classChar, type);
 
+    // 🔍 tenta buscar o player existente
     let player = await this.playerRepo.findOne({ where: { name } });
+
     if (player) {
-      Object.assign(player, { ...stats, score, classChar, type });
-      await this.playerRepo.save(player);
+      // ✅ atualização explícita
+      player.hp = stats.hp;
+      player.mp = stats.mp;
+      player.attack = stats.attack;
+      player.magicAttack = stats.magicAttack;
+      player.defense = stats.defense;
+      player.speedAttack = stats.speedAttack;
+      player.critical = stats.critical;
+      player.criticalDamage = stats.criticalDamage;
+      player.criticalDefense = stats.criticalDefense;
+      player.pvpDamage = stats.pvpDamage;
+      player.pvpDefense = stats.pvpDefense;
+      player.penetration = stats.penetration;
+      player.absorption = stats.absorption;
+      player.precision = stats.precision;
+      player.evasion = stats.evasion;
+      player.manaEconomy = stats.manaEconomy;
+      player.movement = stats.movement;
+      player.score = score;
+      player.classChar = classChar;
+      player.type = type;
+
+      await this.playerRepo.update(player.id, player); // 👈 garante update
     } else {
+      // ✅ cria novo player
       player = this.playerRepo.create({
         name,
         ...stats,
@@ -204,10 +402,14 @@ export class PlayersService {
         classChar,
         type,
       });
-      await this.playerRepo.save(player);
+      await this.playerRepo.insert(player); // 👈 garante insert puro
     }
 
-    const ranking = await this.playerRepo.find({ order: { score: 'DESC' } });
+    // 🔄 força recarregar do banco
+    const ranking = await this.playerRepo.find({
+      order: { score: 'DESC' },
+    });
+
     return ranking.map((p, i) => ({
       position: i + 1,
       score: p.score,

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as Tesseract from 'tesseract.js';
 import * as fs from 'fs/promises';
 import { join } from 'path';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class OcrService {
@@ -21,51 +22,54 @@ export class OcrService {
       throw new Error(`Arquivo não encontrado no caminho: ${normalizedPath}`);
     }
 
+    const processedPath = normalizedPath.replace(/(\.\w+)$/, '_clean$1');
+    await (sharp as any)(normalizedPath)
+      .grayscale()
+      .normalize()
+      .threshold(128)
+      .toFile(processedPath);
+
     const { data } = await Tesseract.recognize(normalizedPath, 'por');
+
     const text = data.text.replace(/\s+/g, ' ');
 
-    const hp = parseInt(text.match(/HP\s+(\d+)/)?.[1] ?? '0', 10);
-    const mp = parseInt(text.match(/MP\s+(\d+)/)?.[1] ?? '0', 10);
-    const attack = parseInt(text.match(/Ataque\s+(\d+)/)?.[1] ?? '0', 10);
-    const defense = parseInt(text.match(/Defesa\s+(\d+)/)?.[1] ?? '0', 10);
-    const magicAttack = parseInt(
-      text.match(/Atq\s+M[aá]gico\s+(\d+)/)?.[1] ?? '0',
-      10,
+    const getNum = (pattern: RegExp): number => {
+      const match = text.match(pattern);
+      if (!match) return 0;
+
+      let raw = match[1].toString().trim();
+      raw = raw.replace(',', '.');
+
+      const found = raw.match(/(\d+(\.\d+)?)/);
+      if (!found) return 0;
+
+      const value = parseFloat(found[1]);
+      return isNaN(value) ? 0 : value;
+    };
+    const hp = getNum(/H[EePp]\s*[:\-]?\s*(\d+)/i);
+    const mp = getNum(/M[PpEeOo]\s*[:\-]?\s*(\d+)/i);
+    const attack = getNum(/Ata[qukce]{1,3}\s*[:\-]?\s*(\d+)/i);
+    const defense = getNum(/Def[e3]sa\s*[:\-]?\s*(\d+)/i);
+    const magicAttack = getNum(/At[aá@]\s*M[aá]gic[o0]\s*(\d+)/i);
+    const speedAttack = getNum(
+      /Vel(?:ocidade)?\s*(?:At[aá@]q(?:ue)?|Ataque)\s*([\d.,]+)/i,
     );
-    const speedAttack = parseFloat(
-      text.match(/Vel(?:ocidade)?\s+Ataque\s+([\d\.]+)/)?.[1] ?? '0',
+    const critical = getNum(/Cr[ií1l]t[ií1l]c[o0]\s*([\d.,]+)/i);
+    const criticalDamage = getNum(/Dano\s*Cr[ií1l]t[ií1l]c[o0]\s*([\d.,]+)/i);
+
+    const pvpDamage = getNum(/Dano\s*P[vVuU][pP]\s*([\d.,]+)/i);
+    const criticalDefense = getNum(
+      /Def[e3]sa\s*(?:Cr[ií1l]t[ií1l]c[o0]|Crit|Cr[ií])\s*([\d.,]+)/i,
     );
-    const critical = parseFloat(
-      text.match(/Cr[ií]tico\s+([\d\.]+)/)?.[1] ?? '0',
+    const pvpDefense = getNum(
+      /Def[e3]sa\s*P[vVuU][pP]\s*(?:EXT|EX|E)?\s*([\d.,]+)/i,
     );
-    const criticalDamage = parseFloat(
-      text.match(/Dano\s+Cr[ií]tico\s+([\d\.]+)/)?.[1] ?? '0',
-    );
-    const criticalDefense = parseFloat(
-      text.match(/Defesa\s+Cr[ií]tica\s+([\d\.]+)/)?.[1] ?? '0',
-    );
-    const pvpDamage = parseFloat(
-      text.match(/Dano\s+PvP\s+([\d\.]+)/)?.[1] ?? '0',
-    );
-    const pvpDefense = parseFloat(
-      text.match(/Defesa\s+PvP\s+([\d\.]+)/)?.[1] ?? '0',
-    );
-    const penetration = parseFloat(
-      text.match(/Perfura[cç][aã]o\s+([\d\.]+)/)?.[1] ?? '0',
-    );
-    const absorption = parseFloat(
-      text.match(/Absor[cç][aã]o\s+([\d\.]+)/)?.[1] ?? '0',
-    );
-    const precision = parseFloat(
-      text.match(/Precis[aã]o\s+([\d\.]+)/)?.[1] ?? '0',
-    );
-    const evasion = parseFloat(text.match(/Evas[aã]o\s+([\d\.]+)/)?.[1] ?? '0');
-    const manaEconomy = parseFloat(
-      text.match(/Economia\s+de\s+Mana\s+([\d\.]+)/)?.[1] ?? '0',
-    );
-    const movement = parseFloat(
-      text.match(/Movimento\s+([\d\.]+)/)?.[1] ?? '0',
-    );
+    const penetration = getNum(/Perfura[cç][aãa]o\s*([\d.,]+)/i);
+    const absorption = getNum(/Absor[cç][aãa]o\s*([\d.,]+)/i);
+    const precision = getNum(/Precis[aãa]o\s*([\d.,]+)/i);
+    const evasion = getNum(/Evas[aãa]o\s*([\d.,]+)/i);
+    const manaEconomy = getNum(/Economia\s*(?:de)?\s*Mana\s*([\d.,]+)/i);
+    const movement = getNum(/Mov[ií1l]ment[o0]\s*([\d.,]+)/i);
 
     await fs.unlink(normalizedPath);
 
